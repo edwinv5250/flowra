@@ -21,18 +21,32 @@ export function validateInvoiceForm(formData: FormData):
   | { state: InvoiceFormState } {
   const amountValue = getString(formData, "amount")
   const campaignId = getString(formData, "campaign_id")
+  const quantityValue = getString(formData, "quantity")
+  const rateValue = getString(formData, "rate")
   const status = getString(formData, "status")
-  const amount = Number(amountValue)
+  const quantity = Number(quantityValue)
+  const rate = Number(rateValue)
+  const fallbackAmount = Number(amountValue)
+  const amount =
+    Number.isFinite(quantity) && Number.isFinite(rate)
+      ? Math.round(quantity * rate * 100) / 100
+      : fallbackAmount
 
   const data = {
     amount,
+    bank_details: getString(formData, "bank_details") || null,
     campaign_id: campaignId && campaignId !== noCampaignValue ? campaignId : null,
+    client_address: getString(formData, "client_address") || null,
     client_name: getString(formData, "client_name"),
     due_date: getString(formData, "due_date"),
     invoice_number: getString(formData, "invoice_number"),
     issued_date: getString(formData, "issued_date"),
+    item_description: getString(formData, "item_description") || null,
     notes: getString(formData, "notes") || null,
     paid_date: getString(formData, "paid_date") || null,
+    payment_terms: getString(formData, "payment_terms") || null,
+    quantity,
+    rate,
     status,
   }
 
@@ -42,8 +56,14 @@ export function validateInvoiceForm(formData: FormData):
   if (!data.client_name) errors.client_name = "Client name is required."
   if (!data.issued_date) errors.issued_date = "Issued date is required."
   if (!data.due_date) errors.due_date = "Due date is required."
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    errors.quantity = "Quantity must be more than zero."
+  }
+  if (!Number.isFinite(rate) || rate < 0) {
+    errors.rate = "Rate must be zero or more."
+  }
   if (!Number.isFinite(amount) || amount < 0) {
-    errors.amount = "Amount must be zero or more."
+    errors.amount = "Total amount must be zero or more."
   }
   if (!isInvoiceStatus(status)) errors.status = "Choose a valid invoice status."
   if (data.issued_date && data.due_date && data.due_date < data.issued_date) {

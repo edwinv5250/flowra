@@ -5,6 +5,7 @@ import type { InvoiceWithCampaign } from "@/features/invoices/invoice-types"
 
 type InvoicePdfInput = {
   creatorEmail?: string | null
+  creatorHandle?: string | null
   creatorName: string
   invoice: InvoiceWithCampaign
 }
@@ -12,9 +13,11 @@ type InvoicePdfInput = {
 const pageWidth = 595
 const pageHeight = 842
 const margin = 56
+const contentWidth = pageWidth - margin * 2
 
 export async function createInvoicePdf({
   creatorEmail,
+  creatorHandle,
   creatorName,
   invoice,
 }: InvoicePdfInput) {
@@ -25,95 +28,132 @@ export async function createInvoicePdf({
 
   let y = pageHeight - margin
 
-  page.drawText("INVOICE", {
+  page.drawText(creatorName, {
     x: margin,
     y,
-    size: 28,
+    size: 16,
     font: boldFont,
     color: rgb(0.08, 0.09, 0.11),
   })
 
-  page.drawText(creatorName, {
+  if (creatorHandle) {
+    page.drawText(formatHandle(creatorHandle), {
+      x: margin,
+      y: y - 19,
+      size: 10,
+      font,
+      color: rgb(0.38, 0.42, 0.48),
+    })
+  }
+
+  if (creatorEmail) {
+    page.drawText(creatorEmail, {
+      x: margin,
+      y: y - (creatorHandle ? 36 : 19),
+      size: 10,
+      font,
+      color: rgb(0.38, 0.42, 0.48),
+    })
+  }
+
+  drawRightText(page, "INVOICE", pageWidth - margin, y, 28, boldFont)
+  drawRightText(page, invoice.invoice_number, pageWidth - margin, y - 30, 11, font)
+
+  y -= 92
+  drawRule(page, y)
+  y -= 34
+
+  page.drawText("Bill To", {
     x: margin,
-    y: y - 34,
+    y,
+    size: 10,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+  page.drawText(invoice.client_name, {
+    x: margin,
+    y: y - 20,
     size: 13,
     font: boldFont,
     color: rgb(0.08, 0.09, 0.11),
   })
 
-  if (creatorEmail) {
-    page.drawText(creatorEmail, {
-      x: margin,
-      y: y - 52,
-      size: 10,
-      font,
-      color: rgb(0.38, 0.42, 0.48),
-    })
+  let addressY = y - 38
+  if (invoice.client_address) {
+    for (const line of wrapText(invoice.client_address, 36)) {
+      page.drawText(line, {
+        x: margin,
+        y: addressY,
+        size: 10,
+        font,
+        color: rgb(0.27, 0.3, 0.35),
+      })
+      addressY -= 15
+    }
   }
 
-  y -= 96
-  drawRule(page, y)
-  y -= 32
-
-  const rows: Array<[string, string]> = [
-    ["Invoice number", invoice.invoice_number],
-    ["Client", invoice.client_name],
-    ["Issue date", formatDate(invoice.issued_date)],
+  const metaRows: Array<[string, string]> = [
+    ["Date", formatDate(invoice.issued_date)],
     ["Due date", formatDate(invoice.due_date)],
+    ["Payment terms", invoice.payment_terms || "-"],
     ["Status", getInvoiceStatusLabel(invoice.status)],
   ]
 
-  if (invoice.paid_date) {
-    rows.push(["Paid date", formatDate(invoice.paid_date)])
-  }
-
-  if (invoice.campaign) {
-    rows.push([
-      "Campaign",
-      `${invoice.campaign.brand_name} - ${invoice.campaign.campaign_title}`,
-    ])
-  }
-
-  for (const [label, value] of rows) {
+  let metaY = y
+  for (const [label, value] of metaRows) {
     page.drawText(label, {
-      x: margin,
-      y,
+      x: 338,
+      y: metaY,
       size: 10,
       font,
       color: rgb(0.38, 0.42, 0.48),
     })
-    page.drawText(value, {
-      x: 220,
-      y,
-      size: 11,
-      font: boldFont,
-      color: rgb(0.08, 0.09, 0.11),
-    })
-    y -= 24
+    drawRightText(page, value, pageWidth - margin, metaY, 10, boldFont)
+    metaY -= 20
   }
 
-  y -= 18
-  drawRule(page, y)
-  y -= 48
+  y -= 126
 
-  page.drawText("Amount due", {
+  page.drawText("Balance Due", {
     x: margin,
     y,
-    size: 12,
+    size: 11,
     font,
     color: rgb(0.38, 0.42, 0.48),
   })
-  page.drawText(formatCurrency(invoice.amount), {
-    x: margin,
-    y: y - 40,
-    size: 30,
+  drawRightText(page, formatCurrency(invoice.amount), pageWidth - margin, y - 10, 24, boldFont)
+
+  y -= 54
+  drawTableHeader(page, y, font)
+  y -= 28
+
+  const itemDescription =
+    invoice.item_description ||
+    invoice.campaign?.campaign_title ||
+    "Creator services"
+
+  drawWrappedText(page, itemDescription, margin, y, 10, font, 34)
+  drawRightText(page, formatQuantity(invoice.quantity), 338, y, 10, font)
+  drawRightText(page, formatCurrency(invoice.rate), 438, y, 10, font)
+  drawRightText(page, formatCurrency(invoice.amount), pageWidth - margin, y, 10, boldFont)
+
+  y -= Math.max(34, wrapText(itemDescription, 34).length * 15 + 10)
+  drawRule(page, y)
+  y -= 28
+
+  page.drawText("Total", {
+    x: 380,
+    y,
+    size: 12,
     font: boldFont,
     color: rgb(0.08, 0.09, 0.11),
   })
+  drawRightText(page, formatCurrency(invoice.amount), pageWidth - margin, y, 12, boldFont)
 
-  y -= 104
+  y -= 58
 
-  if (invoice.notes) {
+  const notes = [invoice.bank_details, invoice.notes].filter(Boolean).join("\n\n")
+  if (notes) {
     page.drawText("Notes", {
       x: margin,
       y,
@@ -121,18 +161,7 @@ export async function createInvoicePdf({
       font: boldFont,
       color: rgb(0.08, 0.09, 0.11),
     })
-    y -= 22
-
-    for (const line of wrapText(invoice.notes, 88)) {
-      page.drawText(line, {
-        x: margin,
-        y,
-        size: 10,
-        font,
-        color: rgb(0.27, 0.3, 0.35),
-      })
-      y -= 16
-    }
+    drawWrappedText(page, notes, margin, y - 22, 10, font, 88)
   }
 
   page.drawText("Generated by Flowra", {
@@ -165,10 +194,107 @@ function drawRule(page: PDFPage, y: number) {
   })
 }
 
+function drawTableHeader(
+  page: PDFPage,
+  y: number,
+  font: Awaited<ReturnType<PDFDocument["embedFont"]>>,
+) {
+  page.drawRectangle({
+    x: margin,
+    y: y - 8,
+    width: contentWidth,
+    height: 26,
+    color: rgb(0.95, 0.96, 0.97),
+  })
+  page.drawText("Item", {
+    x: margin + 10,
+    y,
+    size: 9,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+  page.drawText("Qty", {
+    x: 320,
+    y,
+    size: 9,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+  page.drawText("Rate", {
+    x: 410,
+    y,
+    size: 9,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+  page.drawText("Amount", {
+    x: 500,
+    y,
+    size: 9,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+}
+
+function drawRightText(
+  page: PDFPage,
+  text: string,
+  rightX: number,
+  y: number,
+  size: number,
+  font: Awaited<ReturnType<PDFDocument["embedFont"]>>,
+) {
+  page.drawText(text, {
+    x: rightX - font.widthOfTextAtSize(text, size),
+    y,
+    size,
+    font,
+    color: rgb(0.08, 0.09, 0.11),
+  })
+}
+
+function drawWrappedText(
+  page: PDFPage,
+  text: string,
+  x: number,
+  y: number,
+  size: number,
+  font: Awaited<ReturnType<PDFDocument["embedFont"]>>,
+  maxLength: number,
+) {
+  let currentY = y
+
+  for (const paragraph of text.split(/\n+/)) {
+    for (const line of wrapText(paragraph, maxLength)) {
+      page.drawText(line, {
+        x,
+        y: currentY,
+        size,
+        font,
+        color: rgb(0.27, 0.3, 0.35),
+      })
+      currentY -= 15
+    }
+    currentY -= 6
+  }
+}
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-MY", {
     currency: "MYR",
     style: "currency",
+  }).format(value)
+}
+
+function formatHandle(value: string) {
+  const handle = value.trim()
+  return handle.startsWith("@") ? handle : `@${handle}`
+}
+
+function formatQuantity(value: number) {
+  return new Intl.NumberFormat("en-MY", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
   }).format(value)
 }
 

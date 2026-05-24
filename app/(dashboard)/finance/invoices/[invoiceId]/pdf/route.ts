@@ -45,7 +45,7 @@ export async function GET(_request: Request, { params }: InvoicePdfRouteContext)
   const [{ data: profile }, { data: authUser }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("creator_name, full_name")
+      .select("creator_name, full_name, handle")
       .eq("id", userId)
       .maybeSingle(),
     supabase.auth.getUser(),
@@ -59,6 +59,7 @@ export async function GET(_request: Request, { params }: InvoicePdfRouteContext)
 
   const pdfBytes = await createInvoicePdf({
     creatorEmail: authUser.user?.email,
+    creatorHandle: profile?.handle,
     creatorName,
     invoice: invoiceRow,
   })

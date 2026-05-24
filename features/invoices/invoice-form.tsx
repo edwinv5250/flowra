@@ -121,18 +121,64 @@ export function InvoiceForm({
           />
         </FieldError>
 
-        <FieldError label="Amount (RM)" error={state.errors?.amount}>
+        <FieldError label="Payment terms" error={state.errors?.payment_terms}>
           <Input
-            name="amount"
+            name="payment_terms"
+            defaultValue={invoice?.payment_terms ?? ""}
+            placeholder="e.g. Due on receipt, Net 14"
+          />
+        </FieldError>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="invoice-client-address">Client address</Label>
+        <Textarea
+          id="invoice-client-address"
+          name="client_address"
+          defaultValue={invoice?.client_address ?? ""}
+          placeholder="Optional billing address"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-[1fr_120px_160px]">
+        <FieldError label="Item" error={state.errors?.item_description}>
+          <Input
+            name="item_description"
+            defaultValue={invoice?.item_description ?? selectedCampaign?.campaign_title ?? ""}
+            key={selectedCampaign?.campaign_title ?? invoice?.id ?? "item"}
+            placeholder="e.g. Sponsored content package"
+          />
+        </FieldError>
+
+        <FieldError label="Quantity" error={state.errors?.quantity}>
+          <Input
+            name="quantity"
+            type="number"
+            min="0.01"
+            step="0.01"
+            defaultValue={invoice?.quantity ?? 1}
+            required
+          />
+        </FieldError>
+
+        <FieldError label="Rate (RM)" error={state.errors?.rate}>
+          <Input
+            name="rate"
             type="number"
             min="0"
             step="0.01"
-            defaultValue={invoice?.amount ?? selectedCampaign?.amount ?? 0}
-            key={selectedCampaign?.amount ?? invoice?.id ?? "amount"}
+            defaultValue={invoice?.rate ?? invoice?.amount ?? selectedCampaign?.amount ?? 0}
+            key={selectedCampaign?.amount ?? invoice?.id ?? "rate"}
             required
           />
         </FieldError>
       </div>
+
+      <input
+        type="hidden"
+        name="amount"
+        value={invoice?.amount ?? selectedCampaign?.amount ?? 0}
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
         <FieldError label="Issued date" error={state.errors?.issued_date}>
@@ -146,6 +192,16 @@ export function InvoiceForm({
         <FieldError label="Paid date" error={state.errors?.paid_date}>
           <Input name="paid_date" type="date" defaultValue={invoice?.paid_date ?? ""} />
         </FieldError>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="invoice-bank-details">Bank / payment details</Label>
+        <Textarea
+          id="invoice-bank-details"
+          name="bank_details"
+          defaultValue={invoice?.bank_details ?? ""}
+          placeholder="Optional bank account, DuitNow, or payment instructions"
+        />
       </div>
 
       <div className="space-y-2">

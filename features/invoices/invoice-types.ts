@@ -21,12 +21,18 @@ export type InvoiceCampaignOption = {
 
 export type InvoiceFormField =
   | "amount"
+  | "bank_details"
   | "campaign_id"
+  | "client_address"
   | "client_name"
   | "due_date"
   | "invoice_number"
   | "issued_date"
+  | "item_description"
   | "paid_date"
+  | "payment_terms"
+  | "quantity"
+  | "rate"
   | "status"
 
 export type InvoiceFormState = {
@@ -37,12 +43,18 @@ export type InvoiceFormState = {
 
 export type InvoiceFormValues = {
   amount: number
+  bank_details: string | null
   campaign_id: string | null
+  client_address: string | null
   client_name: string
   due_date: string
   invoice_number: string
   issued_date: string
+  item_description: string | null
   notes: string | null
   paid_date: string | null
+  payment_terms: string | null
+  quantity: number
+  rate: number
   status: InvoiceStatus
 }

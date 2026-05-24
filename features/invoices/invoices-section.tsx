@@ -104,7 +104,7 @@ export function InvoicesSection({ campaignOptions, invoices }: InvoicesSectionPr
           <DialogHeader>
             <DialogTitle>{editingInvoice ? "Edit invoice" : "Create invoice"}</DialogTitle>
             <DialogDescription>
-              Link a campaign to prefill client and amount. PDF generation comes later.
+              Link a campaign to prefill the client, item, and rate for a single-item invoice.
             </DialogDescription>
           </DialogHeader>
           <InvoiceForm

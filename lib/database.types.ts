@@ -105,45 +105,63 @@ export type Database = {
       invoices: {
         Row: {
           amount: number
+          bank_details: string | null
           campaign_id: string | null
+          client_address: string | null
           client_name: string
           created_at: string
           due_date: string
           id: string
           invoice_number: string
+          item_description: string | null
           issued_date: string
           notes: string | null
           paid_date: string | null
+          payment_terms: string | null
+          quantity: number
+          rate: number
           status: Database["public"]["Enums"]["invoice_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
           amount?: number
+          bank_details?: string | null
           campaign_id?: string | null
+          client_address?: string | null
           client_name: string
           created_at?: string
           due_date: string
           id?: string
           invoice_number: string
+          item_description?: string | null
           issued_date: string
           notes?: string | null
           paid_date?: string | null
+          payment_terms?: string | null
+          quantity?: number
+          rate?: number
           status?: Database["public"]["Enums"]["invoice_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          bank_details?: string | null
           campaign_id?: string | null
+          client_address?: string | null
           client_name?: string
           created_at?: string
           due_date?: string
           id?: string
           invoice_number?: string
+          item_description?: string | null
           issued_date?: string
           notes?: string | null
           paid_date?: string | null
+          payment_terms?: string | null
+          quantity?: number
+          rate?: number
           status?: Database["public"]["Enums"]["invoice_status"]
           updated_at?: string
           user_id?: string
