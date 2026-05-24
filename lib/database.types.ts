@@ -108,7 +108,9 @@ export type Database = {
           bank_details: string | null
           campaign_id: string | null
           client_address: string | null
+          client_email: string | null
           client_name: string
+          client_phone: string | null
           created_at: string
           due_date: string
           id: string
@@ -129,7 +131,9 @@ export type Database = {
           bank_details?: string | null
           campaign_id?: string | null
           client_address?: string | null
+          client_email?: string | null
           client_name: string
+          client_phone?: string | null
           created_at?: string
           due_date: string
           id?: string
@@ -150,7 +154,9 @@ export type Database = {
           bank_details?: string | null
           campaign_id?: string | null
           client_address?: string | null
+          client_email?: string | null
           client_name?: string
+          client_phone?: string | null
           created_at?: string
           due_date?: string
           id?: string

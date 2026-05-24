@@ -110,34 +110,60 @@ export function InvoiceForm({
         </Select>
       </FieldError>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <FieldError label="Client name" error={state.errors?.client_name}>
-          <Input
-            name="client_name"
-            defaultValue={invoice?.client_name ?? selectedCampaign?.brand_name}
-            key={selectedCampaign?.brand_name ?? invoice?.id ?? "client"}
-            placeholder="e.g. Brand or client name"
-            required
-          />
-        </FieldError>
+      <div className="space-y-3 rounded-lg border p-4">
+        <div>
+          <h3 className="text-sm font-medium">Bill To</h3>
+          <p className="text-sm text-muted-foreground">Client details shown on the invoice.</p>
+        </div>
 
-        <FieldError label="Payment terms" error={state.errors?.payment_terms}>
-          <Input
-            name="payment_terms"
-            defaultValue={invoice?.payment_terms ?? ""}
-            placeholder="e.g. Due on receipt, Net 14"
-          />
-        </FieldError>
-      </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <FieldError label="Client name" error={state.errors?.client_name}>
+            <Input
+              name="client_name"
+              defaultValue={invoice?.client_name ?? selectedCampaign?.brand_name}
+              key={selectedCampaign?.brand_name ?? invoice?.id ?? "client"}
+              placeholder="e.g. Brand or client name"
+              required
+            />
+          </FieldError>
 
-      <div className="space-y-2">
-        <Label htmlFor="invoice-client-address">Client address</Label>
-        <Textarea
-          id="invoice-client-address"
-          name="client_address"
-          defaultValue={invoice?.client_address ?? ""}
-          placeholder="Optional billing address"
-        />
+          <FieldError label="Client email" error={state.errors?.client_email}>
+            <Input
+              name="client_email"
+              type="email"
+              defaultValue={invoice?.client_email ?? ""}
+              placeholder="client@example.com"
+            />
+          </FieldError>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <FieldError label="Client phone" error={state.errors?.client_phone}>
+            <Input
+              name="client_phone"
+              defaultValue={invoice?.client_phone ?? ""}
+              placeholder="e.g. +60 12-345 6789"
+            />
+          </FieldError>
+
+          <FieldError label="Payment terms" error={state.errors?.payment_terms}>
+            <Input
+              name="payment_terms"
+              defaultValue={invoice?.payment_terms ?? ""}
+              placeholder="e.g. Due on receipt, Net 14"
+            />
+          </FieldError>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="invoice-client-address">Client address</Label>
+          <Textarea
+            id="invoice-client-address"
+            name="client_address"
+            defaultValue={invoice?.client_address ?? ""}
+            placeholder="Optional billing address"
+          />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-[1fr_120px_160px]">

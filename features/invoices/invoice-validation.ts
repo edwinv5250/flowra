@@ -37,7 +37,9 @@ export function validateInvoiceForm(formData: FormData):
     bank_details: getString(formData, "bank_details") || null,
     campaign_id: campaignId && campaignId !== noCampaignValue ? campaignId : null,
     client_address: getString(formData, "client_address") || null,
+    client_email: getString(formData, "client_email") || null,
     client_name: getString(formData, "client_name"),
+    client_phone: getString(formData, "client_phone") || null,
     due_date: getString(formData, "due_date"),
     invoice_number: getString(formData, "invoice_number"),
     issued_date: getString(formData, "issued_date"),
@@ -54,6 +56,9 @@ export function validateInvoiceForm(formData: FormData):
 
   if (!data.invoice_number) errors.invoice_number = "Invoice number is required."
   if (!data.client_name) errors.client_name = "Client name is required."
+  if (data.client_email && !isValidEmail(data.client_email)) {
+    errors.client_email = "Enter a valid email address."
+  }
   if (!data.issued_date) errors.issued_date = "Issued date is required."
   if (!data.due_date) errors.due_date = "Due date is required."
   if (!Number.isFinite(quantity) || quantity <= 0) {
@@ -88,4 +93,8 @@ export function validateInvoiceForm(formData: FormData):
       status: status as InvoiceStatus,
     },
   }
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }

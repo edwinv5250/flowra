@@ -24,7 +24,9 @@ export type InvoiceFormField =
   | "bank_details"
   | "campaign_id"
   | "client_address"
+  | "client_email"
   | "client_name"
+  | "client_phone"
   | "due_date"
   | "invoice_number"
   | "issued_date"
@@ -46,7 +48,9 @@ export type InvoiceFormValues = {
   bank_details: string | null
   campaign_id: string | null
   client_address: string | null
+  client_email: string | null
   client_name: string
+  client_phone: string | null
   due_date: string
   invoice_number: string
   issued_date: string

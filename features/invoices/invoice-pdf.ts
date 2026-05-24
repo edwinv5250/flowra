@@ -28,10 +28,41 @@ export async function createInvoicePdf({
 
   let y = pageHeight - margin
 
+  page.drawRectangle({
+    x: margin,
+    y: y - 8,
+    width: 30,
+    height: 30,
+    color: rgb(0.08, 0.09, 0.11),
+  })
+  page.drawText("F", {
+    x: margin + 10,
+    y: y + 1,
+    size: 16,
+    font: boldFont,
+    color: rgb(1, 1, 1),
+  })
+  page.drawText("Flowra", {
+    x: margin + 42,
+    y: y + 9,
+    size: 16,
+    font: boldFont,
+    color: rgb(0.08, 0.09, 0.11),
+  })
+  page.drawText("Creator Management", {
+    x: margin + 42,
+    y: y - 8,
+    size: 9,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+
+  y -= 48
+
   page.drawText(creatorName, {
     x: margin,
     y,
-    size: 16,
+    size: 11,
     font: boldFont,
     color: rgb(0.08, 0.09, 0.11),
   })
@@ -39,7 +70,7 @@ export async function createInvoicePdf({
   if (creatorHandle) {
     page.drawText(formatHandle(creatorHandle), {
       x: margin,
-      y: y - 19,
+      y: y - 16,
       size: 10,
       font,
       color: rgb(0.38, 0.42, 0.48),
@@ -49,17 +80,25 @@ export async function createInvoicePdf({
   if (creatorEmail) {
     page.drawText(creatorEmail, {
       x: margin,
-      y: y - (creatorHandle ? 36 : 19),
+      y: y - (creatorHandle ? 32 : 16),
       size: 10,
       font,
       color: rgb(0.38, 0.42, 0.48),
     })
   }
 
-  drawRightText(page, "INVOICE", pageWidth - margin, y, 28, boldFont)
-  drawRightText(page, invoice.invoice_number, pageWidth - margin, y - 30, 11, font)
+  drawRightText(page, "INVOICE", pageWidth - margin, pageHeight - margin, 28, boldFont)
+  drawRightText(page, invoice.invoice_number, pageWidth - margin, pageHeight - margin - 30, 11, font)
+  drawRightText(
+    page,
+    getInvoiceStatusLabel(invoice.status),
+    pageWidth - margin,
+    pageHeight - margin - 48,
+    10,
+    boldFont,
+  )
 
-  y -= 92
+  y -= 44
   drawRule(page, y)
   y -= 34
 
@@ -70,6 +109,7 @@ export async function createInvoicePdf({
     font,
     color: rgb(0.38, 0.42, 0.48),
   })
+
   page.drawText(invoice.client_name, {
     x: margin,
     y: y - 20,
@@ -79,8 +119,16 @@ export async function createInvoicePdf({
   })
 
   let addressY = y - 38
-  if (invoice.client_address) {
-    for (const line of wrapText(invoice.client_address, 36)) {
+  const billToLines = [
+    invoice.client_email,
+    invoice.client_phone,
+    invoice.client_address,
+  ].filter(Boolean)
+
+  for (const value of billToLines) {
+    const lines = wrapText(value || "", 38)
+
+    for (const line of lines) {
       page.drawText(line, {
         x: margin,
         y: addressY,
@@ -92,11 +140,23 @@ export async function createInvoicePdf({
     }
   }
 
+  const campaignLabel = invoice.campaign
+    ? `${invoice.campaign.brand_name} - ${invoice.campaign.campaign_title}`
+    : "-"
+
+  page.drawText("Campaign / Description", {
+    x: margin,
+    y: y - 104,
+    size: 10,
+    font,
+    color: rgb(0.38, 0.42, 0.48),
+  })
+  drawWrappedText(page, campaignLabel, margin, y - 122, 10, font, 46)
+
   const metaRows: Array<[string, string]> = [
     ["Date", formatDate(invoice.issued_date)],
     ["Due date", formatDate(invoice.due_date)],
     ["Payment terms", invoice.payment_terms || "-"],
-    ["Status", getInvoiceStatusLabel(invoice.status)],
   ]
 
   let metaY = y
@@ -112,18 +172,18 @@ export async function createInvoicePdf({
     metaY -= 20
   }
 
-  y -= 126
+  y -= 164
 
   page.drawText("Balance Due", {
-    x: margin,
+    x: 360,
     y,
     size: 11,
     font,
     color: rgb(0.38, 0.42, 0.48),
   })
-  drawRightText(page, formatCurrency(invoice.amount), pageWidth - margin, y - 10, 24, boldFont)
+  drawRightText(page, formatCurrency(invoice.amount), pageWidth - margin, y - 12, 24, boldFont)
 
-  y -= 54
+  y -= 62
   drawTableHeader(page, y, font)
   y -= 28
 
