@@ -43,6 +43,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { logout } from "@/lib/auth/actions"
+import { getProfileInitials } from "@/features/profile/profile-display"
 import type { SidebarProfile } from "@/features/profile/profile-types"
 
 const navigation = [
@@ -70,7 +71,12 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
   const displayName = profile?.displayName ?? "Flowra Creator"
   const creatorName = profile?.creatorName ?? "Creator Dashboard"
   const handle = profile?.handle ? `@${profile.handle}` : profile?.email ?? ""
-  const avatarFallback = getInitials(displayName)
+  const avatarFallback = getProfileInitials(
+    profile?.displayName,
+    profile?.creatorName,
+    profile?.handle,
+    profile?.email,
+  )
 
   return (
     <SidebarProvider>
@@ -200,15 +206,4 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
       </SidebarInset>
     </SidebarProvider>
   )
-}
-
-function getInitials(value: string) {
-  const initials = value
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase())
-    .join("")
-
-  return initials || "F"
 }

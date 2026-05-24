@@ -4,6 +4,7 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 
 import { saveProfile } from "@/features/profile/profile-actions"
+import { getProfileInitials } from "@/features/profile/profile-display"
 import type { CurrentUserProfile, ProfileFormState } from "@/features/profile/profile-types"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -18,7 +19,12 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
   const avatarUrl = profile?.avatar_path
     ? getPublicAvatarUrl(profile.avatar_path, profile.updated_at)
     : null
-  const avatarFallback = getInitials(profile?.full_name || profile?.creator_name || currentUser.email)
+  const avatarFallback = getProfileInitials(
+    profile?.full_name,
+    profile?.creator_name,
+    profile?.handle,
+    currentUser.email,
+  )
   const photoActionLabel = avatarUrl ? "Replace photo" : "Upload photo"
 
   return (
@@ -118,17 +124,6 @@ function getPublicAvatarUrl(path: string, version?: string) {
 
   const publicUrl = `${supabaseUrl}/storage/v1/object/public/profile-avatars/${path}`
   return version ? `${publicUrl}?v=${encodeURIComponent(version)}` : publicUrl
-}
-
-function getInitials(value: string) {
-  const initials = value
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase())
-    .join("")
-
-  return initials || "F"
 }
 
 function SubmitButton() {
