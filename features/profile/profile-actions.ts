@@ -56,6 +56,7 @@ export async function uploadProfilePhoto(
   const { error } = await supabase.from("profiles").upsert({
     id: userId,
     avatar_path: avatarResult.avatar_path,
+    updated_at: new Date().toISOString(),
   })
 
   if (error) {

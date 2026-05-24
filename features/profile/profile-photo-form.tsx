@@ -12,11 +12,11 @@ import { getPublicAvatarUrl } from "@/features/profile/profile-avatar"
 import { getProfileInitials } from "@/features/profile/profile-display"
 import { ProfilePhotoCropModal } from "@/features/profile/profile-photo-crop-modal"
 import { validateProfilePhotoFile } from "@/features/profile/profile-photo-utils"
+import { UserAvatar } from "@/features/profile/user-avatar"
 import type {
   CurrentUserProfile,
   ProfilePhotoFormState,
 } from "@/features/profile/profile-types"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -172,12 +172,13 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
         )}
 
         <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            {visibleAvatarUrl && <AvatarImage src={visibleAvatarUrl} alt="Profile photo" />}
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {avatarFallback}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            key={visibleAvatarUrl ?? "no-avatar"}
+            avatarUrl={visibleAvatarUrl}
+            fallback={avatarFallback}
+            alt="Profile photo"
+            className="h-16 w-16 text-lg"
+          />
 
           <div className="flex-1 space-y-2">
             <Label htmlFor="avatar">{avatarUrl ? "Replace photo" : "Upload photo"}</Label>
@@ -189,7 +190,7 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
               onChange={handleFileChange}
             />
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, or WebP. Maximum 2MB.
+              JPG, PNG, or WebP. Maximum 2MB. A crop editor will open so you can zoom and reposition before uploading.
             </p>
             {selectedFileName && (
               <p className="text-xs text-muted-foreground">

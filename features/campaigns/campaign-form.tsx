@@ -1,7 +1,8 @@
 "use client"
 
-import { useActionState, useEffect, type ReactNode } from "react"
+import { useActionState, useEffect, useId, useRef, useState, type ReactNode } from "react"
 import { useFormStatus } from "react-dom"
+import { Plus, X } from "lucide-react"
 
 import {
   campaignPlatformOptions,
@@ -80,14 +81,10 @@ export function CampaignForm({
         </FieldError>
       </div>
 
-      <FieldError label="Deliverables" error={state.errors?.deliverables}>
-        <Textarea
-          name="deliverables"
-          defaultValue={campaign?.deliverables}
-          placeholder="1 TikTok video, 2 IG stories, 1 restaurant visit"
-          required
-        />
-      </FieldError>
+      <DeliverableListInput
+        defaultValue={campaign?.deliverables}
+        error={state.errors?.deliverables}
+      />
 
       <div className="space-y-3 rounded-lg border p-4">
         <div>
@@ -237,5 +234,83 @@ function SubmitButton({ label }: { label: string }) {
     <Button type="submit" disabled={pending}>
       {pending ? "Saving..." : label}
     </Button>
+  )
+}
+
+function DeliverableListInput({
+  defaultValue,
+  error,
+}: {
+  defaultValue?: string
+  error?: string
+}) {
+  const inputId = useId()
+  const [items, setItems] = useState<string[]>(() => {
+    if (!defaultValue) return [""]
+    const parsed = defaultValue.split("\n").filter(Boolean)
+    return parsed.length > 0 ? parsed : [""]
+  })
+  const lastInputRef = useRef<HTMLInputElement>(null)
+
+  function addItem() {
+    setItems((prev) => [...prev, ""])
+    setTimeout(() => lastInputRef.current?.focus(), 0)
+  }
+
+  function removeItem(index: number) {
+    setItems((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function updateItem(index: number, value: string) {
+    setItems((prev) => prev.map((item, i) => (i === index ? value : item)))
+  }
+
+  const joined = items.filter(Boolean).join("\n")
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label htmlFor={inputId}>Deliverables</Label>
+        <span className="text-xs text-muted-foreground">{items.filter(Boolean).length} item{items.filter(Boolean).length !== 1 ? "s" : ""}</span>
+      </div>
+      <input type="hidden" name="deliverables" value={joined} />
+      <div className="space-y-2 rounded-lg border p-3">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <span className="w-5 text-center text-xs text-muted-foreground">{index + 1}.</span>
+            <Input
+              id={index === 0 ? inputId : undefined}
+              ref={index === items.length - 1 ? lastInputRef : undefined}
+              value={item}
+              onChange={(e) => updateItem(index, e.target.value)}
+              placeholder={index === 0 ? "e.g. 1 TikTok video" : "e.g. 2 IG stories"}
+              className="flex-1"
+            />
+            {items.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => removeItem(index)}
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="sr-only">Remove deliverable</span>
+              </Button>
+            )}
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-1 h-8 w-full border border-dashed text-muted-foreground hover:text-foreground"
+          onClick={addItem}
+        >
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          Add deliverable
+        </Button>
+      </div>
+      {error && <p className="text-sm text-destructive">{error}</p>}
+    </div>
   )
 }

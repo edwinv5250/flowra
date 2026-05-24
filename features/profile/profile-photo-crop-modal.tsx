@@ -64,11 +64,15 @@ export function ProfilePhotoCropModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent
+        className="sm:max-w-xl"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Crop profile photo</DialogTitle>
           <DialogDescription>
-            Adjust the square crop before uploading your profile photo.
+            Drag to reposition · use the slider to zoom in or out · click Apply when ready.
           </DialogDescription>
         </DialogHeader>
 
@@ -90,14 +94,20 @@ export function ProfilePhotoCropModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Zoom</Label>
+            <div className="flex items-center justify-between">
+              <Label>Zoom</Label>
+              <span className="text-xs text-muted-foreground">{zoom.toFixed(1)}×</span>
+            </div>
             <Slider
               min={1}
               max={3}
-              step={0.1}
+              step={0.05}
               value={[zoom]}
               onValueChange={(value) => setZoom(value[0] ?? 1)}
             />
+            <p className="text-xs text-muted-foreground">
+              Pinch on mobile, or drag the slider here to zoom
+            </p>
           </div>
         </div>
 

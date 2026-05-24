@@ -32,7 +32,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +44,7 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { logout } from "@/lib/auth/actions"
 import { getProfileInitials } from "@/features/profile/profile-display"
+import { UserAvatar } from "@/features/profile/user-avatar"
 import type { SidebarProfile } from "@/features/profile/profile-types"
 
 const navigation = [
@@ -92,11 +92,11 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
             href="/"
             className="flex items-center gap-2.5 rounded-md outline-none transition-colors hover:bg-sidebar-accent/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0"
           >
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8">
+            <span className="flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-white shadow-md ring-1 ring-black/8 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8">
               <img
-                src="/Flowra_logo.png"
+                src="/Flowra_LOGO.jpg"
                 alt="Flowra"
-                className="h-full w-full scale-150 object-cover"
+                className="h-full w-full scale-[2.2] object-cover"
               />
             </span>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
@@ -130,14 +130,13 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex w-full items-center gap-2.5 rounded-md p-2 transition-colors hover:bg-sidebar-accent/70 group-data-[collapsible=icon]:justify-center">
-                <Avatar className="h-8 w-8">
-                  {profile?.avatarUrl && (
-                    <AvatarImage src={profile.avatarUrl} alt={displayName} />
-                  )}
-                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                    {avatarFallback}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  key={profile?.avatarUrl ?? "no-avatar"}
+                  avatarUrl={profile?.avatarUrl}
+                  fallback={avatarFallback}
+                  alt={displayName}
+                  className="h-8 w-8 text-sm"
+                />
                 <div className="flex flex-1 flex-col items-start text-left group-data-[collapsible=icon]:hidden">
                   <span className="text-sm font-medium text-sidebar-foreground">{displayName}</span>
                   <span className="text-xs text-muted-foreground">{handle || creatorName}</span>

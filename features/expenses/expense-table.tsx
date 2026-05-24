@@ -34,74 +34,79 @@ export function ExpenseTable({ expenses, onEdit }: ExpenseTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Expense</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Campaign</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-            <TableHead className="w-[120px] text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {expenses.map((expense) => (
-            <TableRow key={expense.id}>
-              <TableCell>
-                <div className="space-y-1">
-                  <p className="font-medium">{expense.title}</p>
-                  {expense.notes && (
-                    <p className="text-sm text-muted-foreground">{expense.notes}</p>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge variant="secondary">{getExpenseCategoryLabel(expense.category)}</Badge>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {expense.campaign
-                  ? `${expense.campaign.brand_name} - ${expense.campaign.campaign_title}`
-                  : "General"}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {formatDate(expense.expense_date)}
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                RM {Number(expense.amount).toLocaleString("en-MY")}
-              </TableCell>
-              <TableCell>
-                <div className="flex justify-end gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => onEdit(expense)}
-                  >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit expense</span>
-                  </Button>
-                  <form
-                    action={deleteExpense}
-                    onSubmit={(event) => {
-                      if (!window.confirm("Delete this expense?")) {
-                        event.preventDefault()
-                      }
-                    }}
-                  >
-                    <input type="hidden" name="id" value={expense.id} />
-                    <Button type="submit" variant="ghost" size="icon-sm">
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                      <span className="sr-only">Delete expense</span>
-                    </Button>
-                  </form>
-                </div>
-              </TableCell>
+    <div className="rounded-lg border">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Expense</TableHead>
+              <TableHead className="hidden sm:table-cell">Category</TableHead>
+              <TableHead className="hidden md:table-cell">Campaign</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="w-[80px] text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {expenses.map((expense) => (
+              <TableRow key={expense.id}>
+                <TableCell>
+                  <div className="space-y-1">
+                    <p className="font-medium">{expense.title}</p>
+                    {expense.notes && (
+                      <p className="text-sm text-muted-foreground">{expense.notes}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground sm:hidden">
+                      {getExpenseCategoryLabel(expense.category)}
+                    </p>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  <Badge variant="secondary">{getExpenseCategoryLabel(expense.category)}</Badge>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground md:table-cell">
+                  {expense.campaign
+                    ? `${expense.campaign.brand_name} - ${expense.campaign.campaign_title}`
+                    : "General"}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {formatDate(expense.expense_date)}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  RM {Number(expense.amount).toLocaleString("en-MY")}
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => onEdit(expense)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit expense</span>
+                    </Button>
+                    <form
+                      action={deleteExpense}
+                      onSubmit={(event) => {
+                        if (!window.confirm("Delete this expense?")) {
+                          event.preventDefault()
+                        }
+                      }}
+                    >
+                      <input type="hidden" name="id" value={expense.id} />
+                      <Button type="submit" variant="ghost" size="icon-sm">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <span className="sr-only">Delete expense</span>
+                      </Button>
+                    </form>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
