@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Handshake,
   Receipt,
   LifeBuoy,
   ChevronDown,
+  RefreshCw,
   Settings,
   LogOut,
   User,
@@ -40,6 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
 import { logout } from "@/lib/auth/actions"
 import type { SidebarProfile } from "@/features/profile/profile-types"
 
@@ -64,6 +66,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, currentPage, profile }: DashboardLayoutProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const displayName = profile?.displayName ?? "Flowra Creator"
   const creatorName = profile?.creatorName ?? "Creator Dashboard"
   const handle = profile?.handle ? `@${profile.handle}` : profile?.email ?? ""
@@ -73,15 +76,20 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
     <SidebarProvider>
       <Sidebar variant="sidebar" collapsible="icon">
         <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-lg font-bold">F</span>
-            </div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          >
+            <img
+              src="/Flowra_logo.png"
+              alt="Flowra"
+              className="h-9 w-9 rounded-lg object-contain"
+            />
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="text-sm font-semibold text-sidebar-foreground">Flowra</span>
               <span className="text-xs text-muted-foreground">Creator Dashboard</span>
             </div>
-          </div>
+          </Link>
         </SidebarHeader>
 
         <SidebarContent className="px-2 py-4">
@@ -172,6 +180,16 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
           <SidebarTrigger className="-ml-2" />
           <Separator orientation="vertical" className="h-6" />
           <span className="text-sm font-medium text-muted-foreground">Creator Management</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="ml-auto"
+            onClick={() => router.refresh()}
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span className="sr-only">Refresh page</span>
+          </Button>
         </header>
 
         <main className="flex-1 overflow-auto">
