@@ -4,10 +4,8 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 
 import { saveProfile } from "@/features/profile/profile-actions"
-import { getProfileInitials } from "@/features/profile/profile-display"
 import type { CurrentUserProfile, ProfileFormState } from "@/features/profile/profile-types"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -16,16 +14,6 @@ const initialState: ProfileFormState = {}
 export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }) {
   const [state, formAction] = useActionState(saveProfile, initialState)
   const profile = currentUser.profile
-  const avatarUrl = profile?.avatar_path
-    ? getPublicAvatarUrl(profile.avatar_path, profile.updated_at)
-    : null
-  const avatarFallback = getProfileInitials(
-    profile?.full_name,
-    profile?.creator_name,
-    profile?.handle,
-    currentUser.email,
-  )
-  const photoActionLabel = avatarUrl ? "Replace photo" : "Upload photo"
 
   return (
     <form action={formAction} className="space-y-5">
@@ -41,39 +29,6 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
         <p className="text-xs text-muted-foreground">
           Email comes from your Supabase login account.
         </p>
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="avatar">Profile photo</Label>
-        <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14">
-            {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile picture" />}
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {avatarFallback}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-2">
-            <p className="text-sm font-medium">{photoActionLabel}</p>
-            <Input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" />
-            <p className="text-xs text-muted-foreground">
-              JPG, PNG, or WebP. Maximum 2MB.
-            </p>
-          </div>
-        </div>
-        {state.errors?.avatar && (
-          <p className="text-sm text-destructive">{state.errors.avatar}</p>
-        )}
-        {avatarUrl && (
-          <Button
-            type="submit"
-            name="remove_avatar"
-            value="true"
-            variant="outline"
-            size="sm"
-          >
-            Remove photo
-          </Button>
-        )}
       </div>
 
       <div className="space-y-2">
@@ -113,17 +68,6 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
       <SubmitButton />
     </form>
   )
-}
-
-function getPublicAvatarUrl(path: string, version?: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-
-  if (!supabaseUrl) {
-    return null
-  }
-
-  const publicUrl = `${supabaseUrl}/storage/v1/object/public/profile-avatars/${path}`
-  return version ? `${publicUrl}?v=${encodeURIComponent(version)}` : publicUrl
 }
 
 function SubmitButton() {

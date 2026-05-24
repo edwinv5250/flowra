@@ -9,7 +9,13 @@ export type CurrentUserProfile = {
 }
 
 export type ProfileFormState = {
-  errors?: Partial<Record<"avatar" | "creator_name" | "full_name" | "handle", string>>
+  errors?: Partial<Record<"creator_name" | "full_name" | "handle", string>>
+  message?: string
+  success?: boolean
+}
+
+export type ProfilePhotoFormState = {
+  errors?: Partial<Record<"avatar", string>>
   message?: string
   success?: boolean
 }

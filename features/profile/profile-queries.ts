@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { getPublicAvatarUrl } from "@/features/profile/profile-avatar"
 import type { CurrentUserProfile, SidebarProfile } from "@/features/profile/profile-types"
 import { redirect } from "next/navigation"
 
@@ -43,15 +44,4 @@ export async function getSidebarProfile(): Promise<SidebarProfile> {
     email: currentUser.email,
     handle: profile?.handle ?? null,
   }
-}
-
-function getPublicAvatarUrl(path: string, version?: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-
-  if (!supabaseUrl) {
-    return null
-  }
-
-  const publicUrl = `${supabaseUrl}/storage/v1/object/public/profile-avatars/${path}`
-  return version ? `${publicUrl}?v=${encodeURIComponent(version)}` : publicUrl
 }

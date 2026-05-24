@@ -2,12 +2,15 @@
 
 import { revalidatePath } from "next/cache"
 
+import { avatarBucket } from "@/features/profile/profile-avatar"
 import { validateProfileForm } from "@/features/profile/profile-validation"
-import type { ProfileFormState } from "@/features/profile/profile-types"
+import type {
+  ProfileFormState,
+  ProfilePhotoFormState,
+} from "@/features/profile/profile-types"
 import { requireUserId } from "@/lib/auth/require-user"
 import { createClient } from "@/lib/supabase/server"
 
-const avatarBucket = "profile-avatars"
 const maxAvatarSize = 2 * 1024 * 1024
 const allowedAvatarTypes = ["image/jpeg", "image/png", "image/webp"]
 
@@ -23,22 +26,9 @@ export async function saveProfile(
 
   const userId = await requireUserId()
   const supabase = await createClient()
-  const shouldRemoveAvatar = formData.get("remove_avatar") === "true"
-  const currentAvatarPath = await getCurrentAvatarPath(supabase, userId)
-  const avatarResult = shouldRemoveAvatar
-    ? await removeAvatar(supabase, currentAvatarPath)
-    : await uploadAvatar(supabase, userId, currentAvatarPath, formData)
-
-  if ("state" in avatarResult) {
-    return avatarResult.state
-  }
-
   const { error } = await supabase.from("profiles").upsert({
     id: userId,
     ...validated.data,
-    ...(avatarResult.avatar_path !== undefined
-      ? { avatar_path: avatarResult.avatar_path }
-      : {}),
   })
 
   if (error) {
@@ -50,16 +40,75 @@ export async function saveProfile(
   return { message: "Profile saved.", success: true }
 }
 
+export async function uploadProfilePhoto(
+  _previousState: ProfilePhotoFormState,
+  formData: FormData,
+): Promise<ProfilePhotoFormState> {
+  const userId = await requireUserId()
+  const supabase = await createClient()
+  const currentAvatarPath = await getCurrentAvatarPath(supabase, userId)
+  const avatarResult = await uploadAvatar(supabase, userId, currentAvatarPath, formData)
+
+  if ("state" in avatarResult) {
+    return avatarResult.state
+  }
+
+  const { error } = await supabase.from("profiles").upsert({
+    id: userId,
+    avatar_path: avatarResult.avatar_path,
+  })
+
+  if (error) {
+    return { message: error.message }
+  }
+
+  revalidatePath("/settings")
+  revalidatePath("/", "layout")
+  return { message: "Profile photo uploaded.", success: true }
+}
+
+export async function removeProfilePhoto(
+  _previousState: ProfilePhotoFormState,
+  _formData: FormData,
+): Promise<ProfilePhotoFormState> {
+  const userId = await requireUserId()
+  const supabase = await createClient()
+  const currentAvatarPath = await getCurrentAvatarPath(supabase, userId)
+  const avatarResult = await removeAvatar(supabase, currentAvatarPath)
+
+  if ("state" in avatarResult) {
+    return avatarResult.state
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_path: null })
+    .eq("id", userId)
+
+  if (error) {
+    return { message: error.message }
+  }
+
+  revalidatePath("/settings")
+  revalidatePath("/", "layout")
+  return { message: "Profile photo removed.", success: true }
+}
+
 async function uploadAvatar(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   currentAvatarPath: string | null,
   formData: FormData,
-): Promise<{ avatar_path?: string | null } | { state: ProfileFormState }> {
+): Promise<{ avatar_path: string } | { state: ProfilePhotoFormState }> {
   const avatar = formData.get("avatar")
 
   if (!(avatar instanceof File) || avatar.size === 0) {
-    return {}
+    return {
+      state: {
+        errors: { avatar: "Choose a profile photo first." },
+        message: "Please fix the highlighted fields.",
+      },
+    }
   }
 
   if (!allowedAvatarTypes.includes(avatar.type)) {
@@ -104,7 +153,7 @@ async function uploadAvatar(
 async function removeAvatar(
   supabase: Awaited<ReturnType<typeof createClient>>,
   currentAvatarPath: string | null,
-): Promise<{ avatar_path: null } | { state: ProfileFormState }> {
+): Promise<{ avatar_path: null } | { state: ProfilePhotoFormState }> {
   if (!currentAvatarPath) {
     return { avatar_path: null }
   }

@@ -1,6 +1,7 @@
 import type { CurrentUserProfile } from "@/features/profile/profile-types"
 import { PasswordForm } from "@/features/profile/password-form"
 import { ProfileForm } from "@/features/profile/profile-form"
+import { ProfilePhotoForm } from "@/features/profile/profile-photo-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function SettingsPage({ currentUser }: { currentUser: CurrentUserProfile }) {
@@ -17,10 +18,11 @@ export function SettingsPage({ currentUser }: { currentUser: CurrentUserProfile 
         <CardHeader>
           <CardTitle className="text-base">Profile</CardTitle>
           <CardDescription>
-            Keep this simple for now. Public creator pages and avatar uploads come later.
+            Update the profile details and photo shown inside Flowra.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          <ProfilePhotoForm currentUser={currentUser} />
           <ProfileForm currentUser={currentUser} />
         </CardContent>
       </Card>
