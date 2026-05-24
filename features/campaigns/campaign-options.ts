@@ -1,4 +1,16 @@
-import type { CampaignStatus, PaymentStatus } from "@/features/campaigns/campaign-types"
+import type {
+  CampaignPlatform,
+  CampaignStatus,
+  PaymentStatus,
+} from "@/features/campaigns/campaign-types"
+
+export const campaignPlatformOptions: Array<{ label: string; value: CampaignPlatform }> = [
+  { label: "Instagram", value: "instagram" },
+  { label: "TikTok", value: "tiktok" },
+  { label: "Facebook", value: "facebook" },
+  { label: "XHS", value: "xhs" },
+  { label: "Other", value: "other" },
+]
 
 export const campaignStatusOptions: Array<{ label: string; value: CampaignStatus }> = [
   { label: "Draft", value: "draft" },
@@ -19,6 +31,12 @@ export const paymentStatusOptions: Array<{ label: string; value: PaymentStatus }
 
 export function getCampaignStatusLabel(status: CampaignStatus) {
   return campaignStatusOptions.find((option) => option.value === status)?.label ?? status
+}
+
+export function getCampaignPlatformLabel(platform: CampaignPlatform | null) {
+  if (!platform) return "No platform"
+
+  return campaignPlatformOptions.find((option) => option.value === platform)?.label ?? platform
 }
 
 export function getPaymentStatusLabel(status: PaymentStatus) {

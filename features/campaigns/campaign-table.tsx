@@ -4,6 +4,7 @@ import { Edit, Trash2 } from "lucide-react"
 
 import { deleteCampaign } from "@/features/campaigns/campaign-actions"
 import {
+  getCampaignPlatformLabel,
   getCampaignStatusLabel,
   getPaymentStatusLabel,
 } from "@/features/campaigns/campaign-options"
@@ -42,6 +43,8 @@ export function CampaignTable({ campaigns, onEdit }: CampaignTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Campaign</TableHead>
+            <TableHead>Client</TableHead>
+            <TableHead>Platform</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Due date</TableHead>
@@ -57,6 +60,20 @@ export function CampaignTable({ campaigns, onEdit }: CampaignTableProps) {
                   <p className="font-medium">{campaign.campaign_title}</p>
                   <p className="text-sm text-muted-foreground">{campaign.brand_name}</p>
                 </div>
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                <div className="space-y-1">
+                  <p>{campaign.client_name || "-"}</p>
+                  {campaign.client_email && (
+                    <p className="text-xs">{campaign.client_email}</p>
+                  )}
+                  {campaign.client_phone && (
+                    <p className="text-xs">{campaign.client_phone}</p>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {getCampaignPlatformLabel(campaign.platform)}
               </TableCell>
               <TableCell>
                 <Badge variant="secondary">{getCampaignStatusLabel(campaign.status)}</Badge>

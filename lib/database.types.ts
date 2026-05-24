@@ -14,12 +14,16 @@ export type Database = {
           amount: number
           brand_name: string
           campaign_title: string
+          client_email: string | null
+          client_name: string | null
+          client_phone: string | null
           created_at: string
           deliverables: string
           due_date: string
           id: string
           notes: string | null
           payment_status: Database["public"]["Enums"]["payment_status"]
+          platform: Database["public"]["Enums"]["campaign_platform"] | null
           published_date: string | null
           signed_date: string | null
           status: Database["public"]["Enums"]["campaign_status"]
@@ -30,12 +34,16 @@ export type Database = {
           amount?: number
           brand_name: string
           campaign_title: string
+          client_email?: string | null
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
           deliverables: string
           due_date: string
           id?: string
           notes?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform?: Database["public"]["Enums"]["campaign_platform"] | null
           published_date?: string | null
           signed_date?: string | null
           status?: Database["public"]["Enums"]["campaign_status"]
@@ -46,12 +54,16 @@ export type Database = {
           amount?: number
           brand_name?: string
           campaign_title?: string
+          client_email?: string | null
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
           deliverables?: string
           due_date?: string
           id?: string
           notes?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform?: Database["public"]["Enums"]["campaign_platform"] | null
           published_date?: string | null
           signed_date?: string | null
           status?: Database["public"]["Enums"]["campaign_status"]
@@ -208,6 +220,7 @@ export type Database = {
     Views: Record<string, never>
     Functions: Record<string, never>
     Enums: {
+      campaign_platform: "instagram" | "tiktok" | "facebook" | "xhs" | "other"
       campaign_status:
         | "draft"
         | "negotiating"

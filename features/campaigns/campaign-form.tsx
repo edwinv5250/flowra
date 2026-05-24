@@ -4,6 +4,7 @@ import { useActionState, useEffect, type ReactNode } from "react"
 import { useFormStatus } from "react-dom"
 
 import {
+  campaignPlatformOptions,
   campaignStatusOptions,
   paymentStatusOptions,
 } from "@/features/campaigns/campaign-options"
@@ -87,6 +88,60 @@ export function CampaignForm({
           required
         />
       </FieldError>
+
+      <div className="space-y-3 rounded-lg border p-4">
+        <div>
+          <h3 className="text-sm font-medium">Client contact</h3>
+          <p className="text-sm text-muted-foreground">
+            Optional details for the brand contact or talent manager.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <FieldError label="Client name" error={state.errors?.client_name}>
+            <Input
+              name="client_name"
+              defaultValue={campaign?.client_name ?? ""}
+              placeholder="e.g. Aisyah from brand team"
+            />
+          </FieldError>
+
+          <FieldError label="Client phone" error={state.errors?.client_phone}>
+            <Input
+              name="client_phone"
+              defaultValue={campaign?.client_phone ?? ""}
+              placeholder="e.g. +60 12-345 6789"
+            />
+          </FieldError>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <FieldError label="Client email" error={state.errors?.client_email}>
+            <Input
+              name="client_email"
+              type="email"
+              defaultValue={campaign?.client_email ?? ""}
+              placeholder="client@example.com"
+            />
+          </FieldError>
+
+          <FieldError label="Platform" error={state.errors?.platform}>
+            <Select name="platform" defaultValue={campaign?.platform ?? "none"}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Optional platform" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No platform</SelectItem>
+                {campaignPlatformOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldError>
+        </div>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <FieldError label="Amount (RM)" error={state.errors?.amount}>

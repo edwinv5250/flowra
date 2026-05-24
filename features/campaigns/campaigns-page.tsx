@@ -39,6 +39,10 @@ export function CampaignsPage({ campaigns }: CampaignsPageProps) {
       return (
         campaign.brand_name.toLowerCase().includes(query) ||
         campaign.campaign_title.toLowerCase().includes(query) ||
+        campaign.client_name?.toLowerCase().includes(query) ||
+        campaign.client_email?.toLowerCase().includes(query) ||
+        campaign.client_phone?.toLowerCase().includes(query) ||
+        campaign.platform?.toLowerCase().includes(query) ||
         campaign.deliverables.toLowerCase().includes(query)
       )
     })

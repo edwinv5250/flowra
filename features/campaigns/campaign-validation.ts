@@ -1,17 +1,25 @@
 import {
+  campaignPlatformOptions,
   campaignStatusOptions,
   paymentStatusOptions,
 } from "@/features/campaigns/campaign-options"
 import type {
   CampaignFormState,
   CampaignFormValues,
+  CampaignPlatform,
   CampaignStatus,
   PaymentStatus,
 } from "@/features/campaigns/campaign-types"
 
+const noPlatformValue = "none"
+
 function getString(formData: FormData, key: string) {
   const value = formData.get(key)
   return typeof value === "string" ? value.trim() : ""
+}
+
+function isCampaignPlatform(value: string): value is CampaignPlatform {
+  return campaignPlatformOptions.some((option) => option.value === value)
 }
 
 function isCampaignStatus(value: string): value is CampaignStatus {
@@ -26,6 +34,7 @@ export function validateCampaignForm(formData: FormData):
   | { data: CampaignFormValues }
   | { state: CampaignFormState } {
   const amountValue = getString(formData, "amount")
+  const platform = getString(formData, "platform")
   const status = getString(formData, "status")
   const paymentStatus = getString(formData, "payment_status")
   const amount = Number(amountValue)
@@ -34,10 +43,14 @@ export function validateCampaignForm(formData: FormData):
     amount,
     brand_name: getString(formData, "brand_name"),
     campaign_title: getString(formData, "campaign_title"),
+    client_email: getString(formData, "client_email") || null,
+    client_name: getString(formData, "client_name") || null,
+    client_phone: getString(formData, "client_phone") || null,
     deliverables: getString(formData, "deliverables"),
     due_date: getString(formData, "due_date"),
     notes: getString(formData, "notes") || null,
     payment_status: paymentStatus,
+    platform: platform && platform !== noPlatformValue ? platform : null,
     status,
   }
 
@@ -45,12 +58,18 @@ export function validateCampaignForm(formData: FormData):
 
   if (!data.brand_name) errors.brand_name = "Brand name is required."
   if (!data.campaign_title) errors.campaign_title = "Campaign title is required."
+  if (data.client_email && !isValidEmail(data.client_email)) {
+    errors.client_email = "Enter a valid email address."
+  }
   if (!data.deliverables) errors.deliverables = "Deliverables are required."
   if (!data.due_date) errors.due_date = "Due date is required."
   if (!Number.isFinite(amount) || amount < 0) {
     errors.amount = "Amount must be zero or more."
   }
   if (!isCampaignStatus(status)) errors.status = "Choose a valid campaign status."
+  if (data.platform && !isCampaignPlatform(data.platform)) {
+    errors.platform = "Choose a valid platform."
+  }
   if (!isPaymentStatus(paymentStatus)) {
     errors.payment_status = "Choose a valid payment status."
   }
@@ -65,13 +84,19 @@ export function validateCampaignForm(formData: FormData):
   }
 
   const validPaymentStatus = paymentStatus as PaymentStatus
+  const validPlatform = data.platform as CampaignPlatform | null
   const validStatus = status as CampaignStatus
 
   return {
     data: {
       ...data,
       payment_status: validPaymentStatus,
+      platform: validPlatform,
       status: validStatus,
     },
   }
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
