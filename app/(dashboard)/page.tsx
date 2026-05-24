@@ -1,10 +1,13 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { OverviewDashboard } from "@/components/overview-dashboard"
+import { getCampaigns } from "@/features/campaigns/campaign-queries"
+import { DashboardOverview } from "@/features/dashboard/dashboard-overview"
 
-export default function Home() {
+export default async function Home() {
+  const campaigns = await getCampaigns()
+
   return (
     <DashboardLayout currentPage="overview">
-      <OverviewDashboard />
+      <DashboardOverview campaigns={campaigns} />
     </DashboardLayout>
   )
 }
