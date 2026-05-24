@@ -1,9 +1,12 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { RestaurantCRM } from "@/components/restaurant-crm"
+import { getSidebarProfile } from "@/features/profile/profile-queries"
 
-export default function RestaurantsPage() {
+export default async function RestaurantsPage() {
+  const sidebarProfile = await getSidebarProfile()
+
   return (
-    <DashboardLayout currentPage="restaurants">
+    <DashboardLayout currentPage="restaurants" profile={sidebarProfile}>
       <RestaurantCRM />
     </DashboardLayout>
   )

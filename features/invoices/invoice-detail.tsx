@@ -98,19 +98,28 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
             <DetailLine label="Description" value={itemDescription} />
           </div>
 
-          <div className="overflow-x-auto rounded-lg border">
-            <div className="min-w-[620px]">
-              <div className="grid grid-cols-[1fr_90px_120px_120px] gap-3 border-b bg-muted/40 px-4 py-3 text-sm font-medium text-muted-foreground">
-                <span>Item</span>
-                <span className="text-right">Qty</span>
-                <span className="text-right">Rate</span>
-                <span className="text-right">Amount</span>
+          <div className="rounded-lg border">
+            <div className="hidden grid-cols-[1fr_90px_120px_120px] gap-3 border-b bg-muted/40 px-4 py-3 text-sm font-medium text-muted-foreground sm:grid">
+              <span>Item</span>
+              <span className="text-right">Qty</span>
+              <span className="text-right">Rate</span>
+              <span className="text-right">Amount</span>
+            </div>
+            <div className="hidden grid-cols-[1fr_90px_120px_120px] gap-3 px-4 py-4 text-sm sm:grid">
+              <span>{itemDescription}</span>
+              <span className="text-right">{formatQuantity(invoice.quantity)}</span>
+              <span className="text-right">{formatCurrency(invoice.rate)}</span>
+              <span className="text-right font-medium">{formatCurrency(invoice.amount)}</span>
+            </div>
+            <div className="space-y-1 px-4 py-4 text-sm sm:hidden">
+              <p className="font-medium">{itemDescription}</p>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Qty × Rate</span>
+                <span>{formatQuantity(invoice.quantity)} × {formatCurrency(invoice.rate)}</span>
               </div>
-              <div className="grid grid-cols-[1fr_90px_120px_120px] gap-3 px-4 py-4 text-sm">
-                <span>{itemDescription}</span>
-                <span className="text-right">{formatQuantity(invoice.quantity)}</span>
-                <span className="text-right">{formatCurrency(invoice.rate)}</span>
-                <span className="text-right font-medium">{formatCurrency(invoice.amount)}</span>
+              <div className="flex justify-between font-medium">
+                <span>Amount</span>
+                <span>{formatCurrency(invoice.amount)}</span>
               </div>
             </div>
           </div>
