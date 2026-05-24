@@ -3,6 +3,57 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.reactEasyCrop_Container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.reactEasyCrop_Image,
+.reactEasyCrop_Video {
+  will-change: transform;
+}
+
+.reactEasyCrop_Contain {
+  position: absolute;
+  inset: 0;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+}
+
+.reactEasyCrop_Cover_Horizontal {
+  width: 100%;
+  height: auto;
+}
+
+.reactEasyCrop_Cover_Vertical {
+  width: auto;
+  height: 100%;
+}
+
+.reactEasyCrop_CropArea {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 9999em;
+  transform: translate(-50%, -50%);
+}
+
+.reactEasyCrop_CropAreaRound {
+  border-radius: 50%;
+}
+
 :root {
   /* Warm cream/beige palette for Malaysian Food Creator Dashboard */
   --background: oklch(0.985 0.008 85);

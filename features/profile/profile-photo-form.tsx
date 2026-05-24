@@ -10,6 +10,8 @@ import {
 } from "@/features/profile/profile-actions"
 import { getPublicAvatarUrl } from "@/features/profile/profile-avatar"
 import { getProfileInitials } from "@/features/profile/profile-display"
+import { ProfilePhotoCropModal } from "@/features/profile/profile-photo-crop-modal"
+import { validateProfilePhotoFile } from "@/features/profile/profile-photo-utils"
 import type {
   CurrentUserProfile,
   ProfilePhotoFormState,
@@ -20,8 +22,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 const initialState: ProfilePhotoFormState = {}
-const maxAvatarSize = 2 * 1024 * 1024
-const allowedAvatarTypes = ["image/jpeg", "image/png", "image/webp"]
 
 export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProfile }) {
   const router = useRouter()
@@ -34,9 +34,13 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
     initialState,
   )
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [sourceUrl, setSourceUrl] = useState<string | null>(null)
+  const [sourceFileName, setSourceFileName] = useState("")
   const [selectedFileName, setSelectedFileName] = useState("")
   const [fileError, setFileError] = useState("")
+  const [isCropOpen, setIsCropOpen] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const profile = currentUser.profile
   const avatarUrl = profile?.avatar_path
     ? getPublicAvatarUrl(profile.avatar_path, profile.updated_at)
@@ -53,6 +57,8 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
     if (uploadState.success) {
       formRef.current?.reset()
       setPreviewUrl(null)
+      setSourceUrl(null)
+      setSourceFileName("")
       setSelectedFileName("")
       setFileError("")
       router.refresh()
@@ -63,6 +69,8 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
     if (removeState.success) {
       formRef.current?.reset()
       setPreviewUrl(null)
+      setSourceUrl(null)
+      setSourceFileName("")
       setSelectedFileName("")
       setFileError("")
       router.refresh()
@@ -77,6 +85,14 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
     }
   }, [previewUrl])
 
+  useEffect(() => {
+    return () => {
+      if (sourceUrl) {
+        URL.revokeObjectURL(sourceUrl)
+      }
+    }
+  }, [sourceUrl])
+
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
 
@@ -84,27 +100,59 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
       URL.revokeObjectURL(previewUrl)
     }
 
+    if (sourceUrl) {
+      URL.revokeObjectURL(sourceUrl)
+    }
+
+    if (avatarInputRef.current) {
+      avatarInputRef.current.value = ""
+    }
+
     if (!file) {
       setPreviewUrl(null)
+      setSourceUrl(null)
+      setSourceFileName("")
       setSelectedFileName("")
       setFileError("")
       return
     }
 
-    if (!allowedAvatarTypes.includes(file.type)) {
+    const validationError = validateProfilePhotoFile(file)
+    if (validationError) {
       event.target.value = ""
       setPreviewUrl(null)
+      setSourceUrl(null)
+      setSourceFileName("")
       setSelectedFileName("")
-      setFileError("Upload a JPG, PNG, or WebP image.")
+      setFileError(validationError)
       return
     }
 
-    if (file.size > maxAvatarSize) {
-      event.target.value = ""
-      setPreviewUrl(null)
-      setSelectedFileName("")
-      setFileError("Profile picture must be 2MB or smaller.")
+    const nextSourceUrl = URL.createObjectURL(file)
+    setPreviewUrl(nextSourceUrl)
+    setSourceUrl(nextSourceUrl)
+    setSourceFileName(file.name)
+    setSelectedFileName("")
+    setFileError("")
+    setIsCropOpen(true)
+  }
+
+  function handleApplyCrop(file: File) {
+    const validationError = validateProfilePhotoFile(file)
+    if (validationError) {
+      setFileError(validationError)
       return
+    }
+
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(file)
+
+    if (avatarInputRef.current) {
+      avatarInputRef.current.files = dataTransfer.files
+    }
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
     }
 
     setPreviewUrl(URL.createObjectURL(file))
@@ -115,6 +163,8 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
   return (
     <div className="space-y-4">
       <form ref={formRef} action={uploadAction} className="space-y-4">
+        <input ref={avatarInputRef} type="file" name="avatar" className="sr-only" tabIndex={-1} />
+
         {(uploadState.message || removeState.message) && (
           <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
             {uploadState.message || removeState.message}
@@ -133,7 +183,6 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
             <Label htmlFor="avatar">{avatarUrl ? "Replace photo" : "Upload photo"}</Label>
             <Input
               id="avatar"
-              name="avatar"
               type="file"
               accept="image/png,image/jpeg,image/webp"
               disabled={isUploading || isRemoving}
@@ -162,6 +211,11 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
               {isUploading ? "Uploading..." : "Upload photo"}
             </Button>
           )}
+          {sourceUrl && !selectedFileName && (
+            <Button type="button" variant="outline" onClick={() => setIsCropOpen(true)}>
+              Crop photo
+            </Button>
+          )}
         </div>
       </form>
 
@@ -172,6 +226,15 @@ export function ProfilePhotoForm({ currentUser }: { currentUser: CurrentUserProf
           </Button>
         </form>
       )}
+
+      <ProfilePhotoCropModal
+        imageSource={sourceUrl}
+        fileName={sourceFileName}
+        open={isCropOpen}
+        onOpenChange={setIsCropOpen}
+        onApplyCrop={handleApplyCrop}
+        onError={setFileError}
+      />
     </div>
   )
 }
