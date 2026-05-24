@@ -61,7 +61,7 @@ export function InvoiceTable({ invoices, onEdit }: InvoiceTableProps) {
               <TableCell>
                 <Badge variant="secondary">{getInvoiceStatusLabel(invoice.status)}</Badge>
               </TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className="max-w-[200px] truncate text-muted-foreground">
                 {invoice.campaign
                   ? `${invoice.campaign.brand_name} - ${invoice.campaign.campaign_title}`
                   : "No campaign"}
@@ -76,7 +76,7 @@ export function InvoiceTable({ invoices, onEdit }: InvoiceTableProps) {
                 {invoice.paid_date ? formatDate(invoice.paid_date) : "-"}
               </TableCell>
               <TableCell className="text-right font-medium">
-                RM {Number(invoice.amount).toLocaleString("en-MY")}
+                {formatCurrency(invoice.amount)}
               </TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">
@@ -123,6 +123,13 @@ export function InvoiceTable({ invoices, onEdit }: InvoiceTableProps) {
       </Table>
     </div>
   )
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-MY", {
+    currency: "MYR",
+    style: "currency",
+  }).format(value)
 }
 
 function formatDate(value: string) {

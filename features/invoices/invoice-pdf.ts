@@ -144,14 +144,16 @@ export async function createInvoicePdf({
     ? `${invoice.campaign.brand_name} - ${invoice.campaign.campaign_title}`
     : "-"
 
+  const campaignSectionY = Math.min(y - 104, addressY - 16)
+
   page.drawText("Campaign / Description", {
     x: margin,
-    y: y - 104,
+    y: campaignSectionY,
     size: 10,
     font,
     color: rgb(0.38, 0.42, 0.48),
   })
-  drawWrappedText(page, campaignLabel, margin, y - 122, 10, font, 46)
+  drawWrappedText(page, campaignLabel, margin, campaignSectionY - 18, 10, font, 46)
 
   const metaRows: Array<[string, string]> = [
     ["Date", formatDate(invoice.issued_date)],
