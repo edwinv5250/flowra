@@ -7,12 +7,6 @@ import {
   LayoutDashboard,
   Handshake,
   Receipt,
-  CalendarDays,
-  Store,
-  BarChart3,
-  Sparkles,
-  Bell,
-  Search,
   ChevronDown,
   Settings,
   LogOut,
@@ -36,8 +30,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,7 +38,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { logout } from "@/lib/auth/actions"
 import type { SidebarProfile } from "@/features/profile/profile-types"
@@ -58,15 +49,7 @@ const navigation = [
       { title: "Overview", href: "/", icon: LayoutDashboard },
       { title: "Sponsorships", href: "/sponsorships", icon: Handshake },
       { title: "Finance", href: "/finance", icon: Receipt },
-      { title: "Content Planner", href: "/content", icon: CalendarDays },
-    ],
-  },
-  {
-    title: "Management",
-    items: [
-      { title: "Restaurant CRM", href: "/restaurants", icon: Store },
-      { title: "Analytics", href: "/analytics", icon: BarChart3 },
-      { title: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
+      { title: "Settings", href: "/settings", icon: Settings },
     ],
   },
 ]
@@ -181,77 +164,12 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
       </Sidebar>
 
       <SidebarInset>
-        {/* Top Navbar */}
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
           <SidebarTrigger className="-ml-2" />
           <Separator orientation="vertical" className="h-6" />
-          
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search sponsorships, restaurants..."
-              className="pl-9 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/20"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 ml-auto">
-            {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
-                    3
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel className="flex items-center justify-between">
-                  Notifications
-                  <Badge variant="secondary" className="text-xs">3 new</Badge>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <div className="max-h-80 overflow-auto">
-                  <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-primary" />
-                      <span className="font-medium text-sm">Payment Received</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground pl-4">RM 5,000 from Teh Tarik Place</span>
-                    <span className="text-xs text-muted-foreground pl-4">2 hours ago</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-primary" />
-                      <span className="font-medium text-sm">Content Deadline</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground pl-4">Penang Laksa Reel due tomorrow</span>
-                    <span className="text-xs text-muted-foreground pl-4">5 hours ago</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-muted-foreground" />
-                      <span className="font-medium text-sm">New Collaboration</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground pl-4">Secret Recipe wants to discuss partnership</span>
-                    <span className="text-xs text-muted-foreground pl-4">1 day ago</span>
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Quick Action */}
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI Generate
-            </Button>
-          </div>
+          <span className="text-sm font-medium text-muted-foreground">Creator Management</span>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-auto">
           {children}
         </main>

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'FoodieFlow - Creator Management Dashboard',
+  title: 'Flowra - Creator Management Dashboard',
   description: 'Malaysian food content creator management platform for KOLs, talent managers, and influencer agencies',
   generator: 'v0.app',
   icons: {
