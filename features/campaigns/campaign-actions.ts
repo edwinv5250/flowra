@@ -70,17 +70,21 @@ export async function deleteCampaign(formData: FormData) {
   const id = formData.get("id")
 
   if (typeof id !== "string" || !id) {
-    return
+    throw new Error("Missing campaign id.")
   }
 
   const userId = await requireUserId()
   const supabase = await createClient()
 
-  await supabase
+  const { error } = await supabase
     .from("campaigns")
     .delete()
     .eq("id", id)
     .eq("user_id", userId)
+
+  if (error) {
+    throw new Error(`Could not delete campaign: ${error.message}`)
+  }
 
   revalidatePath(campaignPath)
 }
