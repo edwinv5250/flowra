@@ -131,8 +131,22 @@ export type Database = {
           id: string
           updated_at: string
         }
-        Insert: never
-        Update: never
+        Insert: {
+          created_at?: string
+          creator_name?: string | null
+          full_name?: string | null
+          handle?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_name?: string | null
+          full_name?: string | null
+          handle?: string | null
+          id?: string
+          updated_at?: string
+        }
         Relationships: []
       }
     }

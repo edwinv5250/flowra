@@ -4,15 +4,17 @@ import {
   getExpenses,
 } from "@/features/expenses/expense-queries"
 import { ExpensesPage } from "@/features/expenses/expenses-page"
+import { getSidebarProfile } from "@/features/profile/profile-queries"
 
 export default async function FinancePage() {
-  const [expenses, campaignOptions] = await Promise.all([
+  const [expenses, campaignOptions, sidebarProfile] = await Promise.all([
     getExpenses(),
     getExpenseCampaignOptions(),
+    getSidebarProfile(),
   ])
 
   return (
-    <DashboardLayout currentPage="finance">
+    <DashboardLayout currentPage="finance" profile={sidebarProfile}>
       <ExpensesPage campaignOptions={campaignOptions} expenses={expenses} />
     </DashboardLayout>
   )
