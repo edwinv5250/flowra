@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { logout } from "@/lib/auth/actions"
 
 const navigation = [
   {
@@ -154,9 +155,13 @@ export function DashboardLayout({ children, currentPage }: DashboardLayoutProps)
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
+              <DropdownMenuItem asChild className="text-destructive">
+                <form action={logout}>
+                  <button className="flex w-full items-center">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </button>
+                </form>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
