@@ -15,8 +15,11 @@ const initialState: ProfileFormState = {}
 export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }) {
   const [state, formAction] = useActionState(saveProfile, initialState)
   const profile = currentUser.profile
-  const avatarUrl = profile?.avatar_path ? getPublicAvatarUrl(profile.avatar_path) : null
+  const avatarUrl = profile?.avatar_path
+    ? getPublicAvatarUrl(profile.avatar_path, profile.updated_at)
+    : null
   const avatarFallback = getInitials(profile?.full_name || profile?.creator_name || currentUser.email)
+  const photoActionLabel = avatarUrl ? "Replace photo" : "Upload photo"
 
   return (
     <form action={formAction} className="space-y-5">
@@ -35,7 +38,7 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
       </div>
 
       <div className="space-y-3">
-        <Label htmlFor="avatar">Profile picture</Label>
+        <Label htmlFor="avatar">Profile photo</Label>
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14">
             {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile picture" />}
@@ -44,6 +47,7 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-2">
+            <p className="text-sm font-medium">{photoActionLabel}</p>
             <Input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" />
             <p className="text-xs text-muted-foreground">
               JPG, PNG, or WebP. Maximum 2MB.
@@ -52,6 +56,17 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
         </div>
         {state.errors?.avatar && (
           <p className="text-sm text-destructive">{state.errors.avatar}</p>
+        )}
+        {avatarUrl && (
+          <Button
+            type="submit"
+            name="remove_avatar"
+            value="true"
+            variant="outline"
+            size="sm"
+          >
+            Remove photo
+          </Button>
         )}
       </div>
 
@@ -94,14 +109,15 @@ export function ProfileForm({ currentUser }: { currentUser: CurrentUserProfile }
   )
 }
 
-function getPublicAvatarUrl(path: string) {
+function getPublicAvatarUrl(path: string, version?: string) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
   if (!supabaseUrl) {
     return null
   }
 
-  return `${supabaseUrl}/storage/v1/object/public/profile-avatars/${path}`
+  const publicUrl = `${supabaseUrl}/storage/v1/object/public/profile-avatars/${path}`
+  return version ? `${publicUrl}?v=${encodeURIComponent(version)}` : publicUrl
 }
 
 function getInitials(value: string) {

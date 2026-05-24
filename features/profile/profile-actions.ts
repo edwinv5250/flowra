@@ -23,7 +23,11 @@ export async function saveProfile(
 
   const userId = await requireUserId()
   const supabase = await createClient()
-  const avatarResult = await uploadAvatar(supabase, userId, formData)
+  const shouldRemoveAvatar = formData.get("remove_avatar") === "true"
+  const currentAvatarPath = await getCurrentAvatarPath(supabase, userId)
+  const avatarResult = shouldRemoveAvatar
+    ? await removeAvatar(supabase, currentAvatarPath)
+    : await uploadAvatar(supabase, userId, currentAvatarPath, formData)
 
   if ("state" in avatarResult) {
     return avatarResult.state
@@ -32,7 +36,9 @@ export async function saveProfile(
   const { error } = await supabase.from("profiles").upsert({
     id: userId,
     ...validated.data,
-    ...(avatarResult.avatar_path ? { avatar_path: avatarResult.avatar_path } : {}),
+    ...(avatarResult.avatar_path !== undefined
+      ? { avatar_path: avatarResult.avatar_path }
+      : {}),
   })
 
   if (error) {
@@ -47,12 +53,13 @@ export async function saveProfile(
 async function uploadAvatar(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
+  currentAvatarPath: string | null,
   formData: FormData,
-): Promise<{ avatar_path: string | null } | { state: ProfileFormState }> {
+): Promise<{ avatar_path?: string | null } | { state: ProfileFormState }> {
   const avatar = formData.get("avatar")
 
   if (!(avatar instanceof File) || avatar.size === 0) {
-    return { avatar_path: null }
+    return {}
   }
 
   if (!allowedAvatarTypes.includes(avatar.type)) {
@@ -87,5 +94,43 @@ async function uploadAvatar(
     return { state: { message: `Could not upload profile picture: ${error.message}` } }
   }
 
+  if (currentAvatarPath && currentAvatarPath !== avatarPath) {
+    await supabase.storage.from(avatarBucket).remove([currentAvatarPath])
+  }
+
   return { avatar_path: avatarPath }
+}
+
+async function removeAvatar(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  currentAvatarPath: string | null,
+): Promise<{ avatar_path: null } | { state: ProfileFormState }> {
+  if (!currentAvatarPath) {
+    return { avatar_path: null }
+  }
+
+  const { error } = await supabase.storage.from(avatarBucket).remove([currentAvatarPath])
+
+  if (error) {
+    return { state: { message: `Could not remove profile picture: ${error.message}` } }
+  }
+
+  return { avatar_path: null }
+}
+
+async function getCurrentAvatarPath(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("avatar_path")
+    .eq("id", userId)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`Could not load profile picture: ${error.message}`)
+  }
+
+  return data?.avatar_path ?? null
 }
