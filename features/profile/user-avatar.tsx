@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 type UserAvatarProps = {
@@ -11,38 +10,31 @@ type UserAvatarProps = {
   className?: string
 }
 
-export function UserAvatar({ avatarUrl, fallback, alt = "Avatar", className }: UserAvatarProps) {
-  const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState(false)
+const base =
+  "shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-primary/10 text-primary font-medium select-none"
 
-  // Reset image state whenever the URL changes
+export function UserAvatar({ avatarUrl, fallback, alt = "Avatar", className }: UserAvatarProps) {
+  const [imgFailed, setImgFailed] = useState(false)
+
+  // Reset failure state whenever the URL changes so a new URL gets a fresh attempt
   useEffect(() => {
-    setLoaded(false)
-    setError(false)
+    setImgFailed(false)
   }, [avatarUrl])
 
-  const showImage = Boolean(avatarUrl) && !error
+  if (avatarUrl && !imgFailed) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={alt}
+        className={cn("shrink-0 rounded-full object-cover", className)}
+        onError={() => setImgFailed(true)}
+      />
+    )
+  }
 
   return (
-    <Avatar className={cn("shrink-0", className)}>
-      {showImage && (
-        // Use a plain <img> so we own the load/error state — Radix's
-        // internal state machine can get stuck when src changes on the
-        // same mounted component instance.
-        <img
-          src={avatarUrl!}
-          alt={alt}
-          className="aspect-square size-full rounded-full object-cover"
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-          style={{ display: loaded ? undefined : "none" }}
-        />
-      )}
-      {(!showImage || !loaded) && (
-        <AvatarFallback className="bg-primary/10 text-primary">
-          {fallback}
-        </AvatarFallback>
-      )}
-    </Avatar>
+    <div className={cn(base, className)} aria-label={alt}>
+      {fallback}
+    </div>
   )
 }

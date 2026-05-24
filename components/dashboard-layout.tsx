@@ -78,8 +78,8 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
   const creatorName = profile?.creatorName ?? "Creator Dashboard"
   const handle = profile?.handle ? `@${profile.handle}` : profile?.email ?? ""
   const avatarFallback = getProfileInitials(
-    profile?.displayName,
-    profile?.creatorName,
+    displayName,
+    creatorName,
     profile?.handle,
     profile?.email,
   )
