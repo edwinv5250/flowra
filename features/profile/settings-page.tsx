@@ -1,4 +1,5 @@
 import type { CurrentUserProfile } from "@/features/profile/profile-types"
+import { PasswordForm } from "@/features/profile/password-form"
 import { ProfileForm } from "@/features/profile/profile-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -21,6 +22,18 @@ export function SettingsPage({ currentUser }: { currentUser: CurrentUserProfile 
         </CardHeader>
         <CardContent>
           <ProfileForm currentUser={currentUser} />
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-base">Password</CardTitle>
+          <CardDescription>
+            Update the password used to log in to your Flowra account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PasswordForm />
         </CardContent>
       </Card>
     </div>

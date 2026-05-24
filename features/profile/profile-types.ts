@@ -14,6 +14,14 @@ export type ProfileFormState = {
   success?: boolean
 }
 
+export type PasswordFormState = {
+  errors?: Partial<
+    Record<"current_password" | "new_password" | "confirm_password", string>
+  >
+  message?: string
+  success?: boolean
+}
+
 export type SidebarProfile = {
   creatorName: string
   displayName: string
