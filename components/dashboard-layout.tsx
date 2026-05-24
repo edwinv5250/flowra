@@ -81,12 +81,12 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
   return (
     <SidebarProvider>
       <Sidebar variant="sidebar" collapsible="icon">
-        <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
+        <SidebarHeader className="border-b border-sidebar-border px-4 py-4 group-data-[collapsible=icon]:px-2">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+            className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0"
           >
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8">
               <img
                 src="/Flowra_logo.png"
                 alt="Flowra"
