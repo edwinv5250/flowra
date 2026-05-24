@@ -124,7 +124,9 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
             <DropdownMenuTrigger asChild>
               <button className="flex w-full items-center gap-3 rounded-lg p-2 hover:bg-sidebar-accent transition-colors group-data-[collapsible=icon]:justify-center">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt={displayName} />
+                  {profile?.avatarUrl && (
+                    <AvatarImage src={profile.avatarUrl} alt={displayName} />
+                  )}
                   <AvatarFallback className="bg-primary/10 text-primary text-sm">
                     {avatarFallback}
                   </AvatarFallback>
