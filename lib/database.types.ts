@@ -118,8 +118,36 @@ export type Database = {
           updated_at: string
           user_id: string
         }
-        Insert: never
-        Update: never
+        Insert: {
+          amount?: number
+          campaign_id?: string | null
+          client_name: string
+          created_at?: string
+          due_date: string
+          id?: string
+          invoice_number: string
+          issued_date: string
+          notes?: string | null
+          paid_date?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          client_name?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          issued_date?: string
+          notes?: string | null
+          paid_date?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+          user_id?: string
+        }
         Relationships: []
       }
       profiles: {

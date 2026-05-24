@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Plus, Search } from "lucide-react"
+import type { ReactNode } from "react"
 
 import {
   createExpense,
@@ -27,9 +28,10 @@ import { Input } from "@/components/ui/input"
 type ExpensesPageProps = {
   campaignOptions: ExpenseCampaignOption[]
   expenses: ExpenseWithCampaign[]
+  invoiceSection?: ReactNode
 }
 
-export function ExpensesPage({ campaignOptions, expenses }: ExpensesPageProps) {
+export function ExpensesPage({ campaignOptions, expenses, invoiceSection }: ExpensesPageProps) {
   const [editingExpense, setEditingExpense] = useState<ExpenseWithCampaign | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -80,6 +82,8 @@ export function ExpensesPage({ campaignOptions, expenses }: ExpensesPageProps) {
           New expense
         </Button>
       </div>
+
+      {invoiceSection}
 
       <Card>
         <CardHeader className="gap-4 md:flex-row md:items-center md:justify-between">
