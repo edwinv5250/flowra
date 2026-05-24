@@ -1,10 +1,13 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { SponsorshipManagement } from "@/components/sponsorships/sponsorship-management"
+import { CampaignsPage } from "@/features/campaigns/campaigns-page"
+import { getCampaigns } from "@/features/campaigns/campaign-queries"
 
-export default function SponsorshipsPage() {
+export default async function SponsorshipsPage() {
+  const campaigns = await getCampaigns()
+
   return (
     <DashboardLayout currentPage="sponsorships">
-      <SponsorshipManagement />
+      <CampaignsPage campaigns={campaigns} />
     </DashboardLayout>
   )
 }

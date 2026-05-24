@@ -11,3 +11,13 @@ export async function requireUser() {
 
   return data.claims
 }
+
+export async function requireUserId() {
+  const claims = await requireUser()
+
+  if (!claims.sub) {
+    redirect("/login")
+  }
+
+  return claims.sub
+}
