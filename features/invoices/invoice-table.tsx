@@ -1,6 +1,6 @@
 "use client"
 
-import { Edit, Trash2 } from "lucide-react"
+import { Download, Edit, Trash2 } from "lucide-react"
 
 import { deleteInvoice } from "@/features/invoices/invoice-actions"
 import { getInvoiceStatusLabel } from "@/features/invoices/invoice-options"
@@ -45,7 +45,7 @@ export function InvoiceTable({ invoices, onEdit }: InvoiceTableProps) {
             <TableHead>Due</TableHead>
             <TableHead>Paid</TableHead>
             <TableHead className="text-right">Amount</TableHead>
-            <TableHead className="w-[120px] text-right">Actions</TableHead>
+            <TableHead className="w-[152px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -79,6 +79,12 @@ export function InvoiceTable({ invoices, onEdit }: InvoiceTableProps) {
               </TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">
+                  <Button asChild variant="ghost" size="icon-sm">
+                    <a href={`/finance/invoices/${invoice.id}/pdf`}>
+                      <Download className="h-4 w-4" />
+                      <span className="sr-only">Download invoice PDF</span>
+                    </a>
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
