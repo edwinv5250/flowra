@@ -80,11 +80,11 @@ export function DashboardLayout({ children, currentPage, profile }: DashboardLay
             href="/"
             className="flex items-center gap-3 rounded-lg outline-none transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full">
               <img
                 src="/Flowra_logo.png"
                 alt="Flowra"
-                className="h-full w-full object-cover"
+                className="h-full w-full scale-150 object-cover"
               />
             </span>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
